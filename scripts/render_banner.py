@@ -91,8 +91,6 @@ for i in range(80):
     face[:,:,3]=np.array(mask)
     im.alpha_composite(warp(Image.fromarray(face),0,a))
     rgb=im.convert("RGB")
-    if i in (0,20,40):
-        rgb.save(OUT/f"hero-review-{i}.png")
     frames.append(rgb)
 # Use a single palette to avoid frame-to-frame color flicker.
 palette=frames[0].quantize(colors=128,method=Image.Quantize.MEDIANCUT)

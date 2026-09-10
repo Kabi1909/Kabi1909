@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="#about-me">About</a> ·
-  <a href="#skills--tools">Skills</a> ·
-  <a href="#featured-projects">Projects</a> ·
-  <a href="#github-activity">Activity</a> ·
-  <a href="#lets-connect">Contact</a>
+  <a href="#user-content-about-me">About</a> ·
+  <a href="#user-content-skills--tools">Skills</a> ·
+  <a href="#user-content-featured-projects">Projects</a> ·
+  <a href="#user-content-github-activity">Activity</a> ·
+  <a href="#user-content-lets-connect">Contact</a>
 </p>
 
 ## About me
@@ -89,11 +89,11 @@ A project concept focused on helping students and graduates organize internship 
 
 ## GitHub activity
 
-<img src="./assets/github-stats.svg" alt="GitHub statistics: public repositories, stars, followers and contributions in the past year" width="100%">
+<img src="./assets/github-stats.svg?v=2" alt="GitHub statistics: public repositories, stars, followers and contributions in the past year" width="100%">
 
 <p align="center">
-  <img src="./assets/top-languages.svg" alt="Most-used languages by public repository bytes" width="400">
-  <img src="./assets/streak-stats.svg" alt="Current and longest contribution streaks in the past year" width="400">
+  <img src="./assets/top-languages.svg?v=2" alt="Most-used languages by public repository bytes" width="400">
+  <img src="./assets/streak-stats.svg?v=2" alt="Current and longest contribution streaks in the past year" width="400">
 </p>
 
 ### My contributions, in 3D
