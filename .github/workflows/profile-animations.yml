@@ -1,0 +1,62 @@
+name: Update profile animations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/profile-animations.yml"
+  schedule:
+    - cron: "23 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-animations
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out profile repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: main
+
+      - name: Generate animated 3D contribution calendar
+        uses: yoshi389111/github-profile-3d-contrib@9e3f937195cf840d364388973f73e3c4b3753586
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+
+      - name: Generate light and dark contribution snakes
+        uses: Platane/snk/svg-only@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            assets/github-snake.svg
+            assets/github-snake-dark.svg?palette=github-dark
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify generated assets
+        run: |
+          test -s profile-3d-contrib/profile-green-animate.svg
+          test -s assets/github-snake.svg
+          test -s assets/github-snake-dark.svg
+
+      - name: Commit refreshed assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile-3d-contrib/*.svg assets/github-snake*.svg
+          if git diff --cached --quiet; then
+            echo "Contribution assets are already up to date."
+            exit 0
+          fi
+          git commit -m "chore: refresh profile contribution animations"
+          git pull --rebase origin main
+          git push origin HEAD:main
