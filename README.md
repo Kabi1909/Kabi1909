@@ -111,4 +111,7 @@ Interested in a **full-stack development internship**, a student project, or a c
 
 [![GitHub](https://img.shields.io/badge/Find_me_on_GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Kabi1909)
 
-<!-- Add a verified email, LinkedIn, or portfolio URL here when ready to publish. -->
+[![Email](https://img.shields.io/badge/Email-334155?style=flat-square&logo=gmail&logoColor=white)](mailto:kabijakep@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square)](https://www.linkedin.com/in/kabijake-prathapan-515802328/)
+
+**Email:** [kabijakep@gmail.com](mailto:kabijakep@gmail.com)
