@@ -69,7 +69,7 @@ A full-stack application for exploring Sri Lankan destinations and coordinating 
 
 [Explore the repository →](https://github.com/Kabi1909/TripWise)
 
-<img src="./assets/interntrack.svg" alt="InternTrack — Internship application tracker. Project concept." width="100%">
+<a href="https://github.com/Kabi1909/InternTrack"><img src="./assets/interntrack.svg" alt="InternTrack — Internship application tracker. Project concept." width="100%"></a>
 
 ### InternTrack — Internship application tracker
 
