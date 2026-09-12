@@ -4,6 +4,7 @@ import datetime as dt
 import html
 import json
 import os
+import sys
 from pathlib import Path
 import urllib.request
 
@@ -77,6 +78,12 @@ body=""
 for x,value,label in [(28,len(repos),"PUBLIC REPOSITORIES"),(275,sum(r["stargazerCount"] for r in repos),"STARS EARNED"),(525,user["followers"]["totalCount"],"FOLLOWERS"),(760,calendar["totalContributions"],"CONTRIBUTIONS / YEAR")]:
     body+=text(x,102,f"{value:,}",40,"#85e4f0",700)+text(x,132,label,12)
 stats=card(1000,180,"GitHub at a glance",body,f"Updated {stamp} UTC · Public, owned repositories; forks excluded")
+# The frequent refresh must not rewrite the language or streak cards.
+if "--activity-only" in sys.argv:
+    OUT.mkdir(exist_ok=True)
+    (OUT/"github-stats.svg").write_text(stats,encoding="utf-8")
+    print("Updated GitHub activity card only.")
+    sys.exit(0)
 body=""
 total=sum(lang.values())
 if total:
