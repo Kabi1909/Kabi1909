@@ -1,0 +1,108 @@
+name: Refresh contribution graphics
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "assets/**"
+      - "profile-3d-contrib/**"
+  schedule:
+    # Check account-wide contributions every 15 minutes, away from the hour.
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Serialize with the existing daily profile workflow.
+concurrency:
+  group: profile-animations
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out profile repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: main
+
+      - name: Check for new contribution data
+        id: calendar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROFILE_USERNAME: ${{ github.repository_owner }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, urllib.request
+          query = """query($login: String!) {
+            user(login: $login) {
+              contributionsCollection {
+                contributionCalendar {
+                  totalContributions
+                  weeks { contributionDays { date contributionCount } }
+                }
+              }
+            }
+          }"""
+          request = urllib.request.Request(
+              "https://api.github.com/graphql",
+              data=json.dumps({"query": query, "variables": {"login": os.environ["PROFILE_USERNAME"]}}).encode(),
+              headers={"Authorization": "Bearer " + os.environ["GITHUB_TOKEN"],
+                       "Content-Type": "application/json", "User-Agent": "profile-contribution-refresh"})
+          with urllib.request.urlopen(request, timeout=60) as response:
+              result = json.load(response)
+          if result.get("errors"):
+              raise RuntimeError(json.dumps(result["errors"]))
+          calendar = result["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+          digest = hashlib.sha256(json.dumps(calendar, sort_keys=True).encode()).hexdigest()
+          previous = pathlib.Path("assets/contribution-state.sha256")
+          changed = (os.environ["EVENT_NAME"] != "schedule"
+                     or not previous.exists() or previous.read_text().strip() != digest)
+          pathlib.Path(".git/contribution-state.sha256").write_text(digest + "\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("changed=" + str(changed).lower() + "\n")
+          print("Account contributions:", calendar["totalContributions"])
+          print("Refresh required:", changed)
+          PY
+
+      - name: Refresh 3D contribution graphics
+        if: steps.calendar.outputs.changed == 'true'
+        uses: yoshi389111/github-profile-3d-contrib@9e3f937195cf840d364388973f73e3c4b3753586
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+
+      - name: Refresh contribution snakes
+        if: steps.calendar.outputs.changed == 'true'
+        uses: Platane/snk/svg-only@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            assets/github-snake.svg
+            assets/github-snake-dark.svg?palette=github-dark
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify and publish only contribution assets
+        if: steps.calendar.outputs.changed == 'true'
+        run: |
+          test -s profile-3d-contrib/profile-green-animate.svg
+          test -s profile-3d-contrib/profile-green.svg
+          test -s profile-3d-contrib/profile-night-rainbow.svg
+          test -s assets/github-snake.svg
+          test -s assets/github-snake-dark.svg
+          cp .git/contribution-state.sha256 assets/contribution-state.sha256
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile-3d-contrib/*.svg assets/github-snake.svg assets/github-snake-dark.svg assets/contribution-state.sha256
+          if git diff --cached --quiet; then
+            echo "Contribution graphics are already up to date."
+            exit 0
+          fi
+          git commit -m "chore: sync latest contribution graphics"
+          git pull --rebase origin main
+          git push origin HEAD:main
