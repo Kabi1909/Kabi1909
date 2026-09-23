@@ -79,6 +79,8 @@ A project concept focused on helping students and graduates organize internship 
 
 *Public repository link to be added when available.*
 
+<a href="https://github.com/Kabi1909/Farm2Home"><img src="./assets/farm2home.svg" alt="Farm2Home — Sri Lankan farmer-to-customer marketplace. React, Vite, Express and MongoDB." width="100%"></a>
+
 ## What I'm learning next
 
 - Build maintainable MERN applications with reusable components and clear API contracts.
